@@ -1,0 +1,51 @@
+ID,Nome,Idade,Especialidade,Canal,Dias Antecedência,Data Agendamento,Score Risco (%),Classificação,Cor,Ação Recomendada
+PAC0001,João Silva,69,Pneumologia,Presencial,43,27/06/2026 02:24,27,Baixo,Verde,Fluxo padrão
+PAC0002,Maria Santos,78,Pneumologia,Presencial,58,12/07/2026 02:24,43,Moderado,Amarelo,Lembrete SMS 24h antes
+PAC0003,Pedro Oliveira,41,Oftalmologia,Telefone,53,07/07/2026 02:24,31,Baixo,Verde,Fluxo padrão
+PAC0004,Ana Costa,47,Gastroenterologia,Telefone,21,05/06/2026 02:24,0,Baixo,Verde,Fluxo padrão
+PAC0005,Carlos Ferreira,75,Gastroenterologia,Online,44,28/06/2026 02:24,36,Moderado,Amarelo,Lembrete SMS 24h antes
+PAC0006,Lucia Martins,76,Neurologia,Telefone,28,12/06/2026 02:24,35,Moderado,Amarelo,Lembrete SMS 24h antes
+PAC0007,Roberto Alves,32,Gastroenterologia,Telefone,47,01/07/2026 02:24,33,Baixo,Verde,Fluxo padrão
+PAC0008,Fernanda Rocha,72,Ortopedia,Online,3,18/05/2026 02:24,4,Baixo,Verde,Fluxo padrão
+PAC0009,Bruno Gomes,68,Neurologia,Online,9,24/05/2026 02:24,6,Baixo,Verde,Fluxo padrão
+PAC0010,Patricia Lima,35,Ortopedia,Online,14,29/05/2026 02:24,2,Baixo,Verde,Fluxo padrão
+PAC0011,Ricardo Souza,26,Dermatologia,Online,2,17/05/2026 02:24,14,Baixo,Verde,Fluxo padrão
+PAC0012,Camila Ribeiro,77,Neurologia,Online,8,23/05/2026 02:24,19,Baixo,Verde,Fluxo padrão
+PAC0013,Felipe Barbosa,52,Gastroenterologia,Online,36,20/06/2026 02:24,27,Baixo,Verde,Fluxo padrão
+PAC0014,Juliana Mendes,21,Dermatologia,Telefone,6,21/05/2026 02:24,19,Baixo,Verde,Fluxo padrão
+PAC0015,Marcelo Dias,21,Gastroenterologia,Online,18,02/06/2026 02:24,0,Baixo,Verde,Fluxo padrão
+PAC0016,Beatriz Carvalho,51,Dermatologia,Telefone,36,20/06/2026 02:24,53,Moderado,Amarelo,Lembrete SMS 24h antes
+PAC0017,Lucas Pereira,65,Neurologia,Telefone,23,07/06/2026 02:24,22,Baixo,Verde,Fluxo padrão
+PAC0018,Isabela Monteiro,70,Urologia,Telefone,25,09/06/2026 02:24,27,Baixo,Verde,Fluxo padrão
+PAC0019,Gustavo Teixeira,58,Pneumologia,Presencial,45,29/06/2026 02:24,15,Baixo,Verde,Fluxo padrão
+PAC0020,Sophia Neves,26,Urologia,Online,44,28/06/2026 02:24,7,Baixo,Verde,Fluxo padrão
+PAC0021,André Machado,80,Oftalmologia,Presencial,17,01/06/2026 02:24,32,Baixo,Verde,Fluxo padrão
+PAC0022,Carolina Lopes,52,Oftalmologia,Online,59,13/07/2026 02:24,29,Baixo,Verde,Fluxo padrão
+PAC0023,Thiago Araujo,58,Ortopedia,Presencial,9,24/05/2026 02:24,7,Baixo,Verde,Fluxo padrão
+PAC0024,Larissa Campos,29,Dermatologia,Online,48,02/07/2026 02:24,19,Baixo,Verde,Fluxo padrão
+PAC0025,Diego Moreira,61,Urologia,Telefone,27,11/06/2026 02:24,17,Baixo,Verde,Fluxo padrão
+PAC0026,Gabriela Pinto,82,Oftalmologia,Online,47,01/07/2026 02:24,48,Moderado,Amarelo,Lembrete SMS 24h antes
+PAC0027,Rafael Costa,20,Cardiologia,Online,26,10/06/2026 02:24,0,Baixo,Verde,Fluxo padrão
+PAC0028,Vanessa Rocha,44,Cardiologia,Presencial,15,30/05/2026 02:24,0,Baixo,Verde,Fluxo padrão
+PAC0029,Matheus Silva,68,Neurologia,Presencial,49,03/07/2026 02:24,39,Moderado,Amarelo,Lembrete SMS 24h antes
+PAC0030,Aline Gomes,21,Gastroenterologia,Online,23,07/06/2026 02:24,0,Baixo,Verde,Fluxo padrão
+PAC0031,Rodrigo Martins,32,Oftalmologia,Online,36,20/06/2026 02:24,27,Baixo,Verde,Fluxo padrão
+PAC0032,Natalia Ferreira,49,Neurologia,Presencial,51,05/07/2026 02:24,6,Baixo,Verde,Fluxo padrão
+PAC0033,Vitor Alves,59,Pneumologia,Telefone,57,11/07/2026 02:24,30,Baixo,Verde,Fluxo padrão
+PAC0034,Mariana Souza,45,Ortopedia,Telefone,11,26/05/2026 02:24,6,Baixo,Verde,Fluxo padrão
+PAC0035,Henrique Ribeiro,79,Cardiologia,Online,57,11/07/2026 02:24,29,Baixo,Verde,Fluxo padrão
+PAC0036,Leticia Barbosa,20,Neurologia,Telefone,8,23/05/2026 02:24,8,Baixo,Verde,Fluxo padrão
+PAC0037,Leonardo Mendes,79,Pneumologia,Online,51,05/07/2026 02:24,29,Baixo,Verde,Fluxo padrão
+PAC0038,Priscila Carvalho,61,Urologia,Presencial,59,13/07/2026 02:24,28,Baixo,Verde,Fluxo padrão
+PAC0039,Otavio Pereira,69,Cardiologia,Telefone,49,03/07/2026 02:24,39,Moderado,Amarelo,Lembrete SMS 24h antes
+PAC0040,Vivian Monteiro,29,Gastroenterologia,Presencial,2,17/05/2026 02:24,0,Baixo,Verde,Fluxo padrão
+PAC0041,Cristiano Teixeira,73,Cardiologia,Presencial,49,03/07/2026 02:24,16,Baixo,Verde,Fluxo padrão
+PAC0042,Elisa Neves,19,Ortopedia,Telefone,23,07/06/2026 02:24,4,Baixo,Verde,Fluxo padrão
+PAC0043,Fabio Machado,18,Oftalmologia,Telefone,2,17/05/2026 02:24,21,Baixo,Verde,Fluxo padrão
+PAC0044,Joana Lopes,49,Gastroenterologia,Presencial,4,19/05/2026 02:24,0,Baixo,Verde,Fluxo padrão
+PAC0045,Sergio Araujo,73,Oftalmologia,Online,38,22/06/2026 02:24,39,Moderado,Amarelo,Lembrete SMS 24h antes
+PAC0046,Tatiana Campos,28,Neurologia,Online,9,24/05/2026 02:24,0,Baixo,Verde,Fluxo padrão
+PAC0047,Vinicio Moreira,20,Ortopedia,Presencial,36,20/06/2026 02:24,23,Baixo,Verde,Fluxo padrão
+PAC0048,Cecilia Pinto,84,Neurologia,Presencial,20,04/06/2026 02:24,16,Baixo,Verde,Fluxo padrão
+PAC0049,Wilton Costa,69,Cardiologia,Online,40,24/06/2026 02:24,11,Baixo,Verde,Fluxo padrão
+PAC0050,Yasmin Rocha,18,Oftalmologia,Online,25,09/06/2026 02:24,17,Baixo,Verde,Fluxo padrão
