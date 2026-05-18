@@ -11,6 +11,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 from datetime import datetime
 import json
+import os
 
 # Configuração da página
 st.set_page_config(
@@ -51,24 +52,29 @@ st.markdown("""
 def load_data():
     """Carrega os dados dos pacientes"""
     try:
-        with open('/home/ubuntu/dashboard_data.json', 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        return pd.DataFrame(data)
-    except FileNotFoundError:
-        # Dados de exemplo se arquivo não existir
-        st.warning("Arquivo de dados não encontrado. Usando dados de exemplo.")
-        return pd.DataFrame({
-            'ID': [f'P{i:03d}' for i in range(1, 51)],
-            'Nome': [f'Paciente {i}' for i in range(1, 51)],
-            'Idade': np.random.randint(18, 85, 50),
-            'Especialidade': np.random.choice(['Cardiologia', 'Pneumologia', 'Oftalmologia', 'Gastroenterologia'], 50),
-            'Canal': np.random.choice(['Online', 'Telefone', 'Presencial'], 50),
-            'Dias Antecedência': np.random.randint(1, 30, 50),
-            'Data Agendamento': pd.date_range('2026-05-15', periods=50, freq='D'),
-            'Score Risco (%)': np.random.uniform(0, 100, 50),
-            'Classificação': np.random.choice(['Baixo', 'Moderado', 'Alto'], 50),
-            'Ação Recomendada': np.random.choice(['Fluxo padrão', 'SMS 24h', 'SMS + WhatsApp', 'SMS + WhatsApp + Chamada'], 50)
-        })
+        # Tentar carregar do arquivo JSON (caminho relativo)
+        json_path = os.path.join(os.path.dirname(__file__), 'dashboard_data.json')
+        if os.path.exists(json_path):
+            with open(json_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            return pd.DataFrame(data)
+    except Exception as e:
+        st.warning(f"Não foi possível carregar arquivo JSON: {e}")
+    
+    # Gerar dados de exemplo se arquivo não existir
+    np.random.seed(42)  # Para reproducibilidade
+    return pd.DataFrame({
+        'ID': [f'P{i:03d}' for i in range(1, 51)],
+        'Nome': [f'Paciente {i}' for i in range(1, 51)],
+        'Idade': np.random.randint(18, 85, 50),
+        'Especialidade': np.random.choice(['Cardiologia', 'Pneumologia', 'Oftalmologia', 'Gastroenterologia'], 50),
+        'Canal': np.random.choice(['Online', 'Telefone', 'Presencial'], 50),
+        'Dias Antecedência': np.random.randint(1, 30, 50),
+        'Data Agendamento': pd.date_range('2026-05-15', periods=50, freq='D'),
+        'Score Risco (%)': np.random.uniform(0, 100, 50),
+        'Classificação': np.random.choice(['Baixo', 'Moderado', 'Alto'], 50),
+        'Ação Recomendada': np.random.choice(['Fluxo padrão', 'SMS 24h', 'SMS + WhatsApp', 'SMS + WhatsApp + Chamada'], 50)
+    })
 
 # Carregar dados
 df = load_data()
