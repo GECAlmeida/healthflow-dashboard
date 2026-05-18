@@ -31,13 +31,17 @@ def load_data():
         if os.path.exists(json_path):
             with open(json_path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
-            return pd.DataFrame(data)
+            df = pd.DataFrame(data)
+            # Garantir que Data Agendamento é datetime
+            if 'Data Agendamento' in df.columns:
+                df['Data Agendamento'] = pd.to_datetime(df['Data Agendamento'], errors='coerce')
+            return df
     except Exception as e:
         pass
     
     # Gerar dados de exemplo se arquivo não existir
     np.random.seed(42)
-    return pd.DataFrame({
+    df = pd.DataFrame({
         'ID': [f'P{i:03d}' for i in range(1, 51)],
         'Nome': [f'Paciente {i}' for i in range(1, 51)],
         'Idade': np.random.randint(18, 85, 50),
@@ -49,6 +53,7 @@ def load_data():
         'Classificação': np.random.choice(['Baixo', 'Moderado', 'Alto'], 50),
         'Ação Recomendada': np.random.choice(['Fluxo padrão', 'SMS 24h', 'SMS + WhatsApp', 'SMS + WhatsApp + Chamada'], 50)
     })
+    return df
 
 def get_risk_color(risk_level):
     """Retorna cor baseada no nível de risco"""
@@ -59,12 +64,23 @@ def get_risk_color(risk_level):
     else:
         return '🔴'
 
+def safe_format_date(date_val):
+    """Formata data com segurança"""
+    try:
+        if pd.isna(date_val):
+            return 'N/A'
+        if isinstance(date_val, str):
+            date_val = pd.to_datetime(date_val)
+        return date_val.strftime('%d/%m/%Y')
+    except:
+        return str(date_val)
+
 # ==================== CARREGAR DADOS ====================
 df = load_data()
 
-# Converter Data Agendamento para datetime se necessário
-if df['Data Agendamento'].dtype == 'object':
-    df['Data Agendamento'] = pd.to_datetime(df['Data Agendamento'])
+# Garantir que Data Agendamento é datetime
+if 'Data Agendamento' in df.columns and df['Data Agendamento'].dtype != 'datetime64[ns]':
+    df['Data Agendamento'] = pd.to_datetime(df['Data Agendamento'], errors='coerce')
 
 # ==================== HEADER ====================
 col1, col2 = st.columns([3, 1])
@@ -196,32 +212,37 @@ with col3:
 
 # Preparar dados para exibição
 display_df = filtered_df.copy()
-display_df['Data Agendamento'] = display_df['Data Agendamento'].dt.strftime('%d/%m/%Y')
-display_df['Score Risco (%)'] = display_df['Score Risco (%)'].apply(lambda x: f"{x:.1f}%")
-display_df['Risco'] = display_df['Classificação'].apply(get_risk_color)
 
-# Renomear colunas para exibição
-display_df = display_df[[
-    'ID', 'Nome', 'Idade', 'Especialidade', 'Data Agendamento',
-    'Score Risco (%)', 'Risco', 'Ação Recomendada'
-]]
-
-# Exibir tabela
-st.dataframe(
-    display_df,
-    use_container_width=True,
-    hide_index=True,
-    column_config={
-        'ID': st.column_config.TextColumn('ID', width='small'),
-        'Nome': st.column_config.TextColumn('Paciente'),
-        'Idade': st.column_config.NumberColumn('Idade', width='small'),
-        'Especialidade': st.column_config.TextColumn('Especialidade'),
-        'Data Agendamento': st.column_config.TextColumn('Data'),
-        'Score Risco (%)': st.column_config.TextColumn('Score', width='small'),
-        'Risco': st.column_config.TextColumn('Nível', width='small'),
-        'Ação Recomendada': st.column_config.TextColumn('Ação Recomendada')
-    }
-)
+# Converter Data Agendamento com segurança
+if len(display_df) > 0:
+    display_df['Data Agendamento'] = display_df['Data Agendamento'].apply(safe_format_date)
+    display_df['Score Risco (%)'] = display_df['Score Risco (%)'].apply(lambda x: f"{x:.1f}%")
+    display_df['Risco'] = display_df['Classificação'].apply(get_risk_color)
+    
+    # Renomear colunas para exibição
+    display_df = display_df[[
+        'ID', 'Nome', 'Idade', 'Especialidade', 'Data Agendamento',
+        'Score Risco (%)', 'Risco', 'Ação Recomendada'
+    ]]
+    
+    # Exibir tabela
+    st.dataframe(
+        display_df,
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            'ID': st.column_config.TextColumn('ID', width='small'),
+            'Nome': st.column_config.TextColumn('Paciente'),
+            'Idade': st.column_config.NumberColumn('Idade', width='small'),
+            'Especialidade': st.column_config.TextColumn('Especialidade'),
+            'Data Agendamento': st.column_config.TextColumn('Data'),
+            'Score Risco (%)': st.column_config.TextColumn('Score', width='small'),
+            'Risco': st.column_config.TextColumn('Nível', width='small'),
+            'Ação Recomendada': st.column_config.TextColumn('Ação Recomendada')
+        }
+    )
+else:
+    st.warning("Nenhum agendamento encontrado com os filtros aplicados.")
 
 st.divider()
 
@@ -230,18 +251,22 @@ st.header("📄 Exportar Dados")
 
 # Preparar dados para download
 export_df = filtered_df.copy()
-export_df['Data Agendamento'] = export_df['Data Agendamento'].dt.strftime('%d/%m/%Y')
-export_df['Score Risco (%)'] = export_df['Score Risco (%)'].apply(lambda x: f"{x:.1f}%")
 
-csv = export_df.to_csv(index=False, encoding='utf-8-sig')
-
-st.download_button(
-    label="📥 Baixar Dados em CSV",
-    data=csv,
-    file_name=f"HealthFlow_Dados_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
-    mime="text/csv",
-    use_container_width=True
-)
+if len(export_df) > 0:
+    export_df['Data Agendamento'] = export_df['Data Agendamento'].apply(safe_format_date)
+    export_df['Score Risco (%)'] = export_df['Score Risco (%)'].apply(lambda x: f"{x:.1f}%")
+    
+    csv = export_df.to_csv(index=False, encoding='utf-8-sig')
+    
+    st.download_button(
+        label="📥 Baixar Dados em CSV",
+        data=csv,
+        file_name=f"HealthFlow_Dados_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
+        mime="text/csv",
+        use_container_width=True
+    )
+else:
+    st.info("Nenhum dado para exportar com os filtros aplicados.")
 
 st.divider()
 
