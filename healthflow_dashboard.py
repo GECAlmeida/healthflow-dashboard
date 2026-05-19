@@ -2,7 +2,7 @@
 HealthFlow - Dashboard de Previsão de No-Show
 Aplicação Streamlit para visualizar scores de risco de agendamentos
 Projeto: Mater Dei Challenge 2025 - Sprint 4
-Versão Simplificada: Sem Plotly (apenas Streamlit nativo)
+Versão com PDF Export
 """
 
 import streamlit as st
@@ -11,6 +11,18 @@ import numpy as np
 from datetime import datetime
 import json
 import os
+from io import BytesIO
+
+# ==================== IMPORTAR REPORTLAB ====================
+try:
+    from reportlab.lib.pagesizes import letter, A4
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.units import inch
+    from reportlab.lib import colors
+    HAS_REPORTLAB = True
+except ImportError:
+    HAS_REPORTLAB = False
 
 # Configuração da página
 st.set_page_config(
@@ -74,6 +86,120 @@ def safe_format_date(date_val):
         return date_val.strftime('%d/%m/%Y')
     except:
         return str(date_val)
+
+def generate_pdf_report(filtered_df, df, risk_filter, search_term, sort_by):
+    """Gera relatório em PDF"""
+    if not HAS_REPORTLAB:
+        return None
+    
+    try:
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=0.5*inch, bottomMargin=0.5*inch)
+        
+        # Estilos
+        styles = getSampleStyleSheet()
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Heading1'],
+            fontSize=24,
+            textColor=colors.HexColor('#1f2937'),
+            spaceAfter=6,
+            alignment=1
+        )
+        
+        subtitle_style = ParagraphStyle(
+            'CustomSubtitle',
+            parent=styles['Normal'],
+            fontSize=12,
+            textColor=colors.HexColor('#6b7280'),
+            spaceAfter=12,
+            alignment=1
+        )
+        
+        # Conteúdo do PDF
+        elements = []
+        
+        # Cabeçalho
+        elements.append(Paragraph("HealthFlow - Relatório de Agendamentos", title_style))
+        elements.append(Paragraph("Previsão de No-Show | Mater Dei", subtitle_style))
+        elements.append(Paragraph(f"Gerado em: {datetime.now().strftime('%d/%m/%Y às %H:%M:%S')}", subtitle_style))
+        elements.append(Spacer(1, 0.2*inch))
+        
+        # Resumo de Estatísticas
+        elements.append(Paragraph("Resumo de Estatísticas", styles['Heading2']))
+        summary_data = [
+            ['Métrica', 'Valor'],
+            ['Total de Agendamentos', str(len(df))],
+            ['Risco Alto', str(len(df[df['Classificação'] == 'Alto']))],
+            ['Risco Moderado', str(len(df[df['Classificação'] == 'Moderado']))],
+            ['Risco Baixo', str(len(df[df['Classificação'] == 'Baixo']))],
+            ['Score Médio', f"{df['Score Risco (%)'].mean():.1f}%"]
+        ]
+        
+        summary_table = Table(summary_data, colWidths=[3*inch, 2*inch])
+        summary_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3b82f6')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 12),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black)
+        ]))
+        elements.append(summary_table)
+        elements.append(Spacer(1, 0.3*inch))
+        
+        # Filtros Aplicados
+        elements.append(Paragraph("Filtros Aplicados", styles['Heading2']))
+        filters_text = f"""
+        <b>Risco:</b> {risk_filter}<br/>
+        <b>Busca:</b> {search_term if search_term else 'Nenhuma'}<br/>
+        <b>Ordenação:</b> {sort_by}
+        """
+        elements.append(Paragraph(filters_text, styles['Normal']))
+        elements.append(Spacer(1, 0.3*inch))
+        
+        # Tabela de Pacientes
+        elements.append(Paragraph(f"Lista de Pacientes ({len(filtered_df)})", styles['Heading2']))
+        
+        table_data = [['ID', 'Paciente', 'Idade', 'Especialidade', 'Data', 'Score', 'Risco']]
+        for _, row in filtered_df.iterrows():
+            table_data.append([
+                row['ID'],
+                row['Nome'][:20],
+                str(row['Idade']),
+                row['Especialidade'][:15],
+                safe_format_date(row['Data Agendamento']),
+                f"{row['Score Risco (%)']:.1f}%",
+                row['Classificação']
+            ])
+        
+        patients_table = Table(table_data, colWidths=[0.7*inch, 1.3*inch, 0.6*inch, 1.1*inch, 0.8*inch, 0.7*inch, 0.8*inch])
+        patients_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3b82f6')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('GRID', (0, 0), (-1, -1), 1, colors.grey)
+        ]))
+        elements.append(patients_table)
+        
+        # Rodapé
+        elements.append(Spacer(1, 0.5*inch))
+        elements.append(Paragraph("HealthFlow - Sprint 4 | Mater Dei Challenge 2025", styles['Normal']))
+        
+        # Gerar PDF
+        doc.build(elements)
+        
+        buffer.seek(0)
+        return buffer.getvalue()
+        
+    except Exception as e:
+        st.error(f"Erro ao gerar PDF: {e}")
+        return None
 
 # ==================== CARREGAR DADOS ====================
 df = load_data()
@@ -246,27 +372,49 @@ else:
 
 st.divider()
 
-# ==================== DOWNLOAD CSV ====================
+# ==================== DOWNLOAD ====================
 st.header("📄 Exportar Dados")
 
-# Preparar dados para download
-export_df = filtered_df.copy()
+col1, col2 = st.columns(2)
 
-if len(export_df) > 0:
-    export_df['Data Agendamento'] = export_df['Data Agendamento'].apply(safe_format_date)
-    export_df['Score Risco (%)'] = export_df['Score Risco (%)'].apply(lambda x: f"{x:.1f}%")
+# Download CSV
+with col1:
+    export_df = filtered_df.copy()
     
-    csv = export_df.to_csv(index=False, encoding='utf-8-sig')
-    
-    st.download_button(
-        label="📥 Baixar Dados em CSV",
-        data=csv,
-        file_name=f"HealthFlow_Dados_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
-        mime="text/csv",
-        use_container_width=True
-    )
-else:
-    st.info("Nenhum dado para exportar com os filtros aplicados.")
+    if len(export_df) > 0:
+        export_df['Data Agendamento'] = export_df['Data Agendamento'].apply(safe_format_date)
+        export_df['Score Risco (%)'] = export_df['Score Risco (%)'].apply(lambda x: f"{x:.1f}%")
+        
+        csv = export_df.to_csv(index=False, encoding='utf-8-sig')
+        
+        st.download_button(
+            label="📥 Baixar em CSV",
+            data=csv,
+            file_name=f"HealthFlow_Dados_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
+            mime="text/csv",
+            use_container_width=True
+        )
+    else:
+        st.info("Nenhum dado para exportar com os filtros aplicados.")
+
+# Download PDF
+with col2:
+    if HAS_REPORTLAB:
+        if len(filtered_df) > 0:
+            pdf_data = generate_pdf_report(filtered_df, df, risk_filter, search_term, sort_by)
+            
+            if pdf_data:
+                st.download_button(
+                    label="📄 Baixar em PDF",
+                    data=pdf_data,
+                    file_name=f"HealthFlow_Relatorio_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
+                    mime="application/pdf",
+                    use_container_width=True
+                )
+        else:
+            st.info("Nenhum dado para exportar com os filtros aplicados.")
+    else:
+        st.warning("⚠️ PDF não disponível nesta versão")
 
 st.divider()
 
